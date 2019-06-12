@@ -10,6 +10,7 @@ class MRB_GUI:
         self.top = self.Toplevel(self.root)
 
         self.load_settings()
+        self.state = 'idle'
 
         self.t1 = threading.Thread(target=thread_func, args=[self])
         self.t1.setDaemon(True)
@@ -68,6 +69,9 @@ class MRB_GUI:
         self.top.Connection_label.configure(background="#e00606")
         self.top.Connection_label.configure(text='Disconnected')
 
+    def get_state(self):
+        return self.top.state
+
     def on_closing(self):
         self.save_settings()
         self.root.destroy()
@@ -79,6 +83,8 @@ class MRB_GUI:
             top_layer.geometry("983x635+459+210")
             top_layer.title("Ping Pong Ding Dong")
             top_layer.configure(background="#d9d9d9")
+
+            self.state = ''
 
             self.PID_frame = tk.LabelFrame(top_layer)
             self.PID_frame.place(relx=0.824, rely=0.488, relheight=0.244, relwidth=0.163)
@@ -197,3 +203,37 @@ class MRB_GUI:
             self.Connection_label.configure(relief="ridge")
             self.Connection_label.configure(text='Connecting...')
             self.Connection_label.configure(width=134)
+
+            self.Status_frame = tk.LabelFrame(top_layer)
+            self.Status_frame.place(relx=0.824, rely=0.157, relheight=0.196, relwidth=0.163)
+            self.Status_frame.configure(text='Program state')
+            self.Status_frame.configure(background="#d9d9d9")
+            self.Status_frame.configure(width=160)
+
+            self.Idle_button = tk.Button(self.Status_frame)
+            self.Idle_button.place(relx=0.063, rely=0.24, height=24, width=140, bordermode='ignore')
+            self.Idle_button.configure(background="#d9d9d9")
+            self.Idle_button.configure(text='Idle')
+            self.Idle_button.configure(command=lambda: self.set_state(self.Idle_button))
+
+            self.Calibration_button = tk.Button(self.Status_frame)
+            self.Calibration_button.place(relx=0.063, rely=0.48, height=24, width=140, bordermode='ignore')
+            self.Calibration_button.configure(background="#d9d9d9")
+            self.Calibration_button.configure(text='Calibration')
+            self.Calibration_button.configure(command=lambda: self.set_state(self.Calibration_button))
+
+            self.Active_button = tk.Button(self.Status_frame)
+            self.Active_button.place(relx=0.063, rely=0.72, height=24, width=140, bordermode='ignore')
+            self.Active_button.configure(background="#d9d9d9")
+            self.Active_button.configure(text='Active')
+            self.Active_button.configure(command=lambda: self.set_state(self.Active_button))
+
+            self.set_state(self.Idle_button)
+
+        def set_state(self, button):
+            self.Active_button.configure(state='normal', background="#d9d9d9")
+            self.Calibration_button.configure(state='normal', background="#d9d9d9")
+            self.Idle_button.configure(state='normal', background="#d9d9d9")
+
+            self.state = button['text']
+            button.configure(state='disabled', disabledforeground="#a3a3a3", background="#d9d9d9")

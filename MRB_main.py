@@ -24,6 +24,7 @@ def my_thread(gui):
 
 
 def my_task(gui):
+    print('State:', gui.get_state())
     gui.get_root().after(1000, my_task, gui)
 
 
