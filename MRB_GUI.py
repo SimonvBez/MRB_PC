@@ -68,6 +68,9 @@ class MRB_GUI:
         self.top.Connection_label.configure(background="#e00606")
         self.top.Connection_label.configure(text='Disconnected')
 
+    def get_state(self):
+        return self.top.state.get()
+
     def on_closing(self):
         self.save_settings()
         self.root.destroy()
@@ -79,6 +82,8 @@ class MRB_GUI:
             top_layer.geometry("983x635+459+210")
             top_layer.title("Ping Pong Ding Dong")
             top_layer.configure(background="#d9d9d9")
+
+            self.state = tk.StringVar(None, "Idle")
 
             self.PID_frame = tk.LabelFrame(top_layer)
             self.PID_frame.place(relx=0.824, rely=0.488, relheight=0.244, relwidth=0.163)
@@ -197,3 +202,30 @@ class MRB_GUI:
             self.Connection_label.configure(relief="ridge")
             self.Connection_label.configure(text='Connecting...')
             self.Connection_label.configure(width=134)
+
+            self.Status_frame = tk.LabelFrame(top_layer)
+            self.Status_frame.place(relx=0.824, rely=0.204, relheight=0.149, relwidth=0.163)
+            self.Status_frame.configure(text='Program state')
+            self.Status_frame.configure(background="#d9d9d9")
+            self.Status_frame.configure(width=160)
+            
+            self.Idle_radiobutton = tk.Radiobutton(self.Status_frame, text="Idle", variable=self.state, value="Idle")
+            self.Idle_radiobutton.place(relx=0.063, rely=0.211, relheight=0.263, relwidth=0.363, bordermode='ignore')
+            self.Idle_radiobutton.configure(activebackground="#d9d9d9")
+            self.Idle_radiobutton.configure(anchor='w')
+            self.Idle_radiobutton.configure(background="#d9d9d9")
+            self.Idle_radiobutton.configure(justify='left')
+            
+            self.Calibration_radiobutton = tk.Radiobutton(self.Status_frame, text="Calibration", variable=self.state, value="Calibration")
+            self.Calibration_radiobutton.place(relx=0.063, rely=0.421, relheight=0.263, relwidth=0.6, bordermode='ignore')
+            self.Calibration_radiobutton.configure(activebackground="#d9d9d9")
+            self.Calibration_radiobutton.configure(anchor='w')
+            self.Calibration_radiobutton.configure(background="#d9d9d9")
+            self.Calibration_radiobutton.configure(justify='left')
+            
+            self.Active_radiobutton = tk.Radiobutton(self.Status_frame, text="Active", variable=self.state, value="Active")
+            self.Active_radiobutton.place(relx=0.063, rely=0.632, relheight=0.263, relwidth=0.488, bordermode='ignore')
+            self.Active_radiobutton.configure(activebackground="#d9d9d9")
+            self.Active_radiobutton.configure(anchor='w')
+            self.Active_radiobutton.configure(background="#d9d9d9")
+            self.Active_radiobutton.configure(justify='left')
