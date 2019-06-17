@@ -84,6 +84,7 @@ class MRB_GUI:
             top_layer.configure(background="#d9d9d9")
 
             self.state = tk.StringVar(None, "Idle")
+            self.previous_state = "Off"
 
             self.PID_frame = tk.LabelFrame(top_layer)
             self.PID_frame.place(relx=0.824, rely=0.488, relheight=0.244, relwidth=0.163)
@@ -229,3 +230,6 @@ class MRB_GUI:
             self.Active_radiobutton.configure(anchor='w')
             self.Active_radiobutton.configure(background="#d9d9d9")
             self.Active_radiobutton.configure(justify='left')
+
+            self.Webcam = tk.Canvas(top_layer, width=640, height=480)
+            self.Webcam.grid(row=0, column=0)
