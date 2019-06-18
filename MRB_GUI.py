@@ -79,7 +79,7 @@ class MRB_GUI:
         def __init__(self, top_layer):
             """This class configures and populates the toplevel window.
                top is the toplevel containing window."""
-            top_layer.geometry("983x635+459+210")
+            top_layer.geometry("834x738+569+208")
             top_layer.title("Ping Pong Ding Dong")
             top_layer.configure(background="#d9d9d9")
 
@@ -87,7 +87,7 @@ class MRB_GUI:
             self.previous_state = "Off"
 
             self.PID_frame = tk.LabelFrame(top_layer)
-            self.PID_frame.place(relx=0.824, rely=0.488, relheight=0.244, relwidth=0.163)
+            self.PID_frame.place(relx=0.791, rely=0.42, relheight=0.21, relwidth=0.192)
             self.PID_frame.configure(text='PID Controls')
             self.PID_frame.configure(background="#d9d9d9")
             self.PID_frame.configure(width=160)
@@ -138,7 +138,7 @@ class MRB_GUI:
             self.Kd_message.configure(width=20)
 
             self.ServoOffset_frame = tk.LabelFrame(top_layer)
-            self.ServoOffset_frame.place(relx=0.824, rely=0.74, relheight=0.244, relwidth=0.163)
+            self.ServoOffset_frame.place(relx=0.791, rely=0.637, relheight=0.21, relwidth=0.192)
             self.ServoOffset_frame.configure(text='Servo offsets')
             self.ServoOffset_frame.configure(background="#d9d9d9")
             self.ServoOffset_frame.configure(width=160)
@@ -189,7 +189,7 @@ class MRB_GUI:
             self.Ser3_scale.configure(troughcolor="#d9d9d9")
 
             self.Connection_frame = tk.LabelFrame(top_layer)
-            self.Connection_frame.place(relx=0.824, rely=0.362, relheight=0.118, relwidth=0.163)
+            self.Connection_frame.place(relx=0.791, rely=0.312, relheight=0.102, relwidth=0.192)
             self.Connection_frame.configure(text='Connection Status')
             self.Connection_frame.configure(background="#d9d9d9")
             self.Connection_frame.configure(width=160)
@@ -205,7 +205,7 @@ class MRB_GUI:
             self.Connection_label.configure(width=134)
 
             self.Status_frame = tk.LabelFrame(top_layer)
-            self.Status_frame.place(relx=0.824, rely=0.204, relheight=0.149, relwidth=0.163)
+            self.Status_frame.place(relx=0.791, rely=0.176, relheight=0.129, relwidth=0.192)
             self.Status_frame.configure(text='Program state')
             self.Status_frame.configure(background="#d9d9d9")
             self.Status_frame.configure(width=160)
@@ -231,5 +231,8 @@ class MRB_GUI:
             self.Active_radiobutton.configure(background="#d9d9d9")
             self.Active_radiobutton.configure(justify='left')
 
-            self.Webcam = tk.Canvas(top_layer, width=640, height=480)
+            self.Webcam = tk.Canvas(top_layer, width=640, height=480, background="#c9c9c9", highlightthickness=1, highlightbackground="black")
             self.Webcam.grid(row=0, column=0)
+
+            self.Webcam_mask = tk.Canvas(top_layer, width=320, height=240, background="#c9c9c9", highlightthickness=1, highlightbackground="black")
+            self.Webcam_mask.grid(row=1, column=0)

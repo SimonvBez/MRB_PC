@@ -56,6 +56,7 @@ def cam_thread(gui):
             gui.get_top().Webcam.create_image(0, 0, image=photo, anchor='nw')
             gui.get_top().Webcam.obr = photo
             gui.get_top().Webcam.bind("<Button 1>", window_click)
+        time.sleep(0.2)
 
 
 def gui_thread(gui):
