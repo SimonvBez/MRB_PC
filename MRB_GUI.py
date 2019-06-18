@@ -85,9 +85,37 @@ class MRB_GUI:
 
             self.state = tk.StringVar(None, "Idle")
             self.previous_state = "Off"
+            self.selection_mode = tk.StringVar(None, "Ball Calibration")
+
+            self.Selection_frame = tk.LabelFrame(top_layer)
+            self.Selection_frame.place(relx=0.791, rely=0.081, relheight=0.156, relwidth=0.192)
+            self.Selection_frame.configure(text="Selection Tool")
+            self.Selection_frame.configure(background="#d9d9d9")
+            self.Selection_frame.configure(width=160)
+
+            self.Ball_calibration_button = tk.Button(self.Selection_frame)
+            self.Ball_calibration_button.place(relx=0.063, rely=0.174, height=24, width=141, bordermode='ignore')
+            self.Ball_calibration_button.configure(background="#d9d9d9")
+            self.Ball_calibration_button.configure(text="Ball Calibration")
+            self.Ball_calibration_button.configure(command=lambda: self.select_button(self.Ball_calibration_button))
+            self.Ball_calibration_button.configure(width=141)
+
+            self.Servo_calibration_button = tk.Button(self.Selection_frame)
+            self.Servo_calibration_button.place(relx=0.063, rely=0.435, height=24, width=141, bordermode='ignore')
+            self.Servo_calibration_button.configure(background="#d9d9d9")
+            self.Servo_calibration_button.configure(text="Servo Calibration")
+            self.Servo_calibration_button.configure(command=lambda: self.select_button(self.Servo_calibration_button))
+            self.Servo_calibration_button.configure(width=141)
+
+            self.Ball_position_button = tk.Button(self.Selection_frame)
+            self.Ball_position_button.place(relx=0.063, rely=0.696, height=24, width=141, bordermode='ignore')
+            self.Ball_position_button.configure(background="#d9d9d9")
+            self.Ball_position_button.configure(text="Ball position")
+            self.Ball_position_button.configure(command=lambda: self.select_button(self.Ball_position_button))
+            self.Ball_position_button.configure(width=141)
 
             self.PID_frame = tk.LabelFrame(top_layer)
-            self.PID_frame.place(relx=0.791, rely=0.42, relheight=0.21, relwidth=0.192)
+            self.PID_frame.place(relx=0.791, rely=0.488, relheight=0.21, relwidth=0.192)
             self.PID_frame.configure(text='PID Controls')
             self.PID_frame.configure(background="#d9d9d9")
             self.PID_frame.configure(width=160)
@@ -138,7 +166,7 @@ class MRB_GUI:
             self.Kd_message.configure(width=20)
 
             self.ServoOffset_frame = tk.LabelFrame(top_layer)
-            self.ServoOffset_frame.place(relx=0.791, rely=0.637, relheight=0.21, relwidth=0.192)
+            self.ServoOffset_frame.place(relx=0.791, rely=0.705, relheight=0.21, relwidth=0.192)
             self.ServoOffset_frame.configure(text='Servo offsets')
             self.ServoOffset_frame.configure(background="#d9d9d9")
             self.ServoOffset_frame.configure(width=160)
@@ -189,7 +217,7 @@ class MRB_GUI:
             self.Ser3_scale.configure(troughcolor="#d9d9d9")
 
             self.Connection_frame = tk.LabelFrame(top_layer)
-            self.Connection_frame.place(relx=0.791, rely=0.312, relheight=0.102, relwidth=0.192)
+            self.Connection_frame.place(relx=0.791, rely=0.379, relheight=0.102, relwidth=0.192)
             self.Connection_frame.configure(text='Connection Status')
             self.Connection_frame.configure(background="#d9d9d9")
             self.Connection_frame.configure(width=160)
@@ -205,7 +233,7 @@ class MRB_GUI:
             self.Connection_label.configure(width=134)
 
             self.Status_frame = tk.LabelFrame(top_layer)
-            self.Status_frame.place(relx=0.791, rely=0.176, relheight=0.129, relwidth=0.192)
+            self.Status_frame.place(relx=0.791, rely=0.244, relheight=0.129, relwidth=0.192)
             self.Status_frame.configure(text='Program state')
             self.Status_frame.configure(background="#d9d9d9")
             self.Status_frame.configure(width=160)
@@ -236,3 +264,13 @@ class MRB_GUI:
 
             self.Webcam_mask = tk.Canvas(top_layer, width=320, height=240, background="#c9c9c9", highlightthickness=1, highlightbackground="black")
             self.Webcam_mask.grid(row=1, column=0)
+
+            self.select_button(self.Ball_calibration_button)
+
+        def select_button(self, button):
+            self.Ball_calibration_button.configure(state='normal')
+            self.Ball_position_button.configure(state='normal')
+            self.Servo_calibration_button.configure(state='normal')
+
+            button.configure(state='disabled')
+            self.selection_mode.set(button['text'])

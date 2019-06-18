@@ -14,16 +14,24 @@ def window_click(event):
     global lower_orange
     global upper_orange
     global hsv
+    global select_state
 
-    hsv_color = hsv[event.y, event.x]
-    lower_orange = (hsv_color - np.array([4, 100, 30])).clip(0, 255)
-    upper_orange = (hsv_color + np.array([4, 255, 255])).clip(0, 255)
+    if select_state.get() == "Ball Calibration":
+        hsv_color = hsv[event.y, event.x]
+        lower_orange = (hsv_color - np.array([4, 100, 30])).clip(0, 255)
+        upper_orange = (hsv_color + np.array([4, 255, 255])).clip(0, 255)
+    elif select_state.get() == "Servo Calibration":
+        print("Servo cal")
+    elif select_state.get() == "Ball position":
+        print("Ball pos")
 
 
 def cam_thread(gui):
     global lower_orange
     global upper_orange
     global hsv
+    global select_state
+    select_state = gui.get_top().selection_mode
 
     cap = cv2.VideoCapture(0)
 
@@ -79,8 +87,8 @@ def gui_thread(gui):
             state = gui.get_top().state.get()
 
             if state == "Active":
-                controller.set_servo_percentages([100, 100, 100])
-                time.sleep(1)
+                controller.set_servo_percentages([100 + servo_offsets[0], 100 + servo_offsets[1], 100 + servo_offsets[2]])
+                time.sleep(0.1)
             elif state == "Calibration":
                 controller.set_servo_percentages([0 + servo_offsets[0], servo_offsets[1], servo_offsets[2]])
                 time.sleep(0.1)
@@ -96,6 +104,7 @@ def gui_thread(gui):
 
 
 def gui_task(gui):
+    # Enables the servo offset scales when in Calibration mode
     new_state = gui.get_top().state.get()
     old_state = gui.get_top().previous_state
     if new_state != old_state:
