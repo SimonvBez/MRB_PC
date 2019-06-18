@@ -161,7 +161,7 @@ class MRB_GUI:
             self.Ser3_message.configure(text='#3')
             self.Ser3_message.configure(width=60)
 
-            self.Ser1_scale = tk.Scale(self.ServoOffset_frame, from_=-50.0, to=50.0)
+            self.Ser1_scale = tk.Scale(self.ServoOffset_frame, from_=-15.0, to=15.0)
             self.Ser1_scale.place(relx=0.188, rely=0.129, relwidth=0.763, relheight=0.0, height=42, bordermode='ignore')
             self.Ser1_scale.configure(background="#d9d9d9")
             self.Ser1_scale.configure(highlightbackground="#d9d9d9")
@@ -170,7 +170,7 @@ class MRB_GUI:
             self.Ser1_scale.configure(orient="horizontal")
             self.Ser1_scale.configure(troughcolor="#d9d9d9")
 
-            self.Ser2_scale = tk.Scale(self.ServoOffset_frame, from_=-50.0, to=50.0)
+            self.Ser2_scale = tk.Scale(self.ServoOffset_frame, from_=-15.0, to=15.0)
             self.Ser2_scale.place(relx=0.188, rely=0.387, relwidth=0.763, relheight=0.0, height=42, bordermode='ignore')
             self.Ser2_scale.configure(background="#d9d9d9")
             self.Ser2_scale.configure(highlightbackground="#d9d9d9")
@@ -179,7 +179,7 @@ class MRB_GUI:
             self.Ser2_scale.configure(orient="horizontal")
             self.Ser2_scale.configure(troughcolor="#d9d9d9")
 
-            self.Ser3_scale = tk.Scale(self.ServoOffset_frame, from_=-50.0, to=50.0)
+            self.Ser3_scale = tk.Scale(self.ServoOffset_frame, from_=-15.0, to=15.0)
             self.Ser3_scale.place(relx=0.188, rely=0.645, relwidth=0.763, relheight=0.0, height=42, bordermode='ignore')
             self.Ser3_scale.configure(background="#d9d9d9")
             self.Ser3_scale.configure(highlightbackground="#d9d9d9")

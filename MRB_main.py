@@ -52,11 +52,17 @@ def cam_thread(gui):
                     cv2.circle(bgr, (int(x), int(y)), int(radius), (0, 255, 255), 2)
                     cv2.circle(bgr, center, 5, (0, 0, 255), -1)
 
-            photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)))
-            gui.get_top().Webcam.create_image(0, 0, image=photo, anchor='nw')
-            gui.get_top().Webcam.obr = photo
+            mask = cv2.resize(mask, None, fx=0.5, fy=0.5)
+
+            rgb_photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)))
+            mask_photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(mask))
+            gui.get_top().Webcam.create_image(0, 0, image=rgb_photo, anchor='nw')
+            gui.get_top().Webcam.obr = rgb_photo
+            gui.get_top().Webcam_mask.create_image(0, 0, image=mask_photo, anchor='nw')
+            gui.get_top().Webcam_mask.orb = mask_photo
             gui.get_top().Webcam.bind("<Button 1>", window_click)
-        time.sleep(0.2)
+        else:
+            time.sleep(0.2)
 
 
 def gui_thread(gui):
