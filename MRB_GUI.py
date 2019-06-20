@@ -1,23 +1,44 @@
+import MRB_Constants
 import tkinter as tk
 import threading
 import json
 
 
 class MRB_GUI:
-    def __init__(self, after_func, thread_func):
+    def __init__(self, controller):
         """Starting point when module is the main routine."""
         self.root = tk.Tk()
         self.top = self.Toplevel(self.root)
 
         self.load_settings()
 
-        self.t1 = threading.Thread(target=thread_func, args=[self])
-        self.t1.setDaemon(True)
-        self.t1.start()
+        controller.set_gui(self)
+
+        t1 = threading.Thread(target=controller.gui_thread)
+        t1.setDaemon(True)
+        t1.start()
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.root.after(0, after_func, self)
+        self.root.after(0, controller.gui_task)
+        self.root.after(0, self.update_gui)
         self.root.mainloop()
+
+    def update_gui(self):
+        new_state = self.top.program_state.get()
+        old_state = self.top.previous_state
+        if new_state != old_state:
+            if new_state == MRB_Constants.STATE_CALIBRATION:
+                self.top.Ser1_scale.config(state="normal")
+                self.top.Ser2_scale.config(state="normal")
+                self.top.Ser3_scale.config(state="normal")
+            else:
+                self.top.Ser1_scale.config(state="disabled")
+                self.top.Ser2_scale.config(state="disabled")
+                self.top.Ser3_scale.config(state="disabled")
+
+        self.top.previous_state = new_state
+
+        self.root.after(50, self.update_gui)
 
     def get_settings(self):
         return {
@@ -60,16 +81,22 @@ class MRB_GUI:
     def get_top(self):
         return self.top
 
-    def set_connected(self):
-        self.top.Connection_label.configure(background="#1dc104")
-        self.top.Connection_label.configure(text='Connected')
+    def set_connected(self, state):
+        if state:
+            self.top.Connection_label.configure(background="#1dc104")
+            self.top.Connection_label.configure(text=MRB_Constants.CONNECTED)
+        else:
+            self.top.Connection_label.configure(background="#e00606")
+            self.top.Connection_label.configure(text=MRB_Constants.DISCONNECTED)
 
-    def set_disconnected(self):
-        self.top.Connection_label.configure(background="#e00606")
-        self.top.Connection_label.configure(text='Disconnected')
+    def get_program_state(self):
+        return self.top.program_state.get()
 
-    def get_state(self):
-        return self.top.state.get()
+    def get_select_mode(self):
+        return self.top.selection_mode.get()
+
+    def get_servo_offsets(self):
+        return self.top.Ser1_scale.get(), self.top.Ser2_scale.get(), self.top.Ser3_scale.get()
 
     def on_closing(self):
         self.save_settings()
@@ -83,9 +110,9 @@ class MRB_GUI:
             top_layer.title("Ping Pong Ding Dong")
             top_layer.configure(background="#d9d9d9")
 
-            self.state = tk.StringVar(None, "Idle")
+            self.program_state = tk.StringVar(None, MRB_Constants.STATE_IDLE)
             self.previous_state = "Off"
-            self.selection_mode = tk.StringVar(None, "Ball Calibration")
+            self.selection_mode = tk.StringVar(None, MRB_Constants.BALL_COLOR_CALIBRATION)
 
             self.Selection_frame = tk.LabelFrame(top_layer)
             self.Selection_frame.place(relx=0.791, rely=0.081, relheight=0.156, relwidth=0.192)
@@ -93,26 +120,26 @@ class MRB_GUI:
             self.Selection_frame.configure(background="#d9d9d9")
             self.Selection_frame.configure(width=160)
 
-            self.Ball_calibration_button = tk.Button(self.Selection_frame)
-            self.Ball_calibration_button.place(relx=0.063, rely=0.174, height=24, width=141, bordermode='ignore')
-            self.Ball_calibration_button.configure(background="#d9d9d9")
-            self.Ball_calibration_button.configure(text="Ball Calibration")
-            self.Ball_calibration_button.configure(command=lambda: self.select_button(self.Ball_calibration_button))
-            self.Ball_calibration_button.configure(width=141)
+            self.Ball_color_calibration_button = tk.Button(self.Selection_frame)
+            self.Ball_color_calibration_button.place(relx=0.063, rely=0.174, height=24, width=141, bordermode='ignore')
+            self.Ball_color_calibration_button.configure(background="#d9d9d9")
+            self.Ball_color_calibration_button.configure(text=MRB_Constants.BALL_COLOR_CALIBRATION)
+            self.Ball_color_calibration_button.configure(command=lambda: self.set_select_state(self.Ball_color_calibration_button))
+            self.Ball_color_calibration_button.configure(width=141)
 
             self.Servo_calibration_button = tk.Button(self.Selection_frame)
             self.Servo_calibration_button.place(relx=0.063, rely=0.435, height=24, width=141, bordermode='ignore')
             self.Servo_calibration_button.configure(background="#d9d9d9")
-            self.Servo_calibration_button.configure(text="Servo Calibration")
-            self.Servo_calibration_button.configure(command=lambda: self.select_button(self.Servo_calibration_button))
+            self.Servo_calibration_button.configure(text=MRB_Constants.SELECT_SERVO_POS)
+            self.Servo_calibration_button.configure(command=lambda: self.set_select_state(self.Servo_calibration_button))
             self.Servo_calibration_button.configure(width=141)
 
-            self.Ball_position_button = tk.Button(self.Selection_frame)
-            self.Ball_position_button.place(relx=0.063, rely=0.696, height=24, width=141, bordermode='ignore')
-            self.Ball_position_button.configure(background="#d9d9d9")
-            self.Ball_position_button.configure(text="Ball position")
-            self.Ball_position_button.configure(command=lambda: self.select_button(self.Ball_position_button))
-            self.Ball_position_button.configure(width=141)
+            self.Ball_destination_button = tk.Button(self.Selection_frame)
+            self.Ball_destination_button.place(relx=0.063, rely=0.696, height=24, width=141, bordermode='ignore')
+            self.Ball_destination_button.configure(background="#d9d9d9")
+            self.Ball_destination_button.configure(text=MRB_Constants.SELECT_BALL_DEST)
+            self.Ball_destination_button.configure(command=lambda: self.set_select_state(self.Ball_destination_button))
+            self.Ball_destination_button.configure(width=141)
 
             self.PID_frame = tk.LabelFrame(top_layer)
             self.PID_frame.place(relx=0.791, rely=0.488, relheight=0.21, relwidth=0.192)
@@ -229,7 +256,7 @@ class MRB_GUI:
             self.Connection_label.configure(font="-family {Segoe UI} -size 12 -weight bold -slant roman -underline 0 -overstrike 0")
             self.Connection_label.configure(foreground="#000000")
             self.Connection_label.configure(relief="ridge")
-            self.Connection_label.configure(text='Connecting...')
+            self.Connection_label.configure(text=MRB_Constants.CONNECTING)
             self.Connection_label.configure(width=134)
 
             self.Status_frame = tk.LabelFrame(top_layer)
@@ -238,21 +265,21 @@ class MRB_GUI:
             self.Status_frame.configure(background="#d9d9d9")
             self.Status_frame.configure(width=160)
             
-            self.Idle_radiobutton = tk.Radiobutton(self.Status_frame, text="Idle", variable=self.state, value="Idle")
+            self.Idle_radiobutton = tk.Radiobutton(self.Status_frame, text=MRB_Constants.STATE_IDLE, variable=self.program_state, value="Idle")
             self.Idle_radiobutton.place(relx=0.063, rely=0.211, relheight=0.263, relwidth=0.3, bordermode='ignore')
             self.Idle_radiobutton.configure(activebackground="#d9d9d9")
             self.Idle_radiobutton.configure(anchor='w')
             self.Idle_radiobutton.configure(background="#d9d9d9")
             self.Idle_radiobutton.configure(justify='left')
             
-            self.Calibration_radiobutton = tk.Radiobutton(self.Status_frame, text="Calibration", variable=self.state, value="Calibration")
+            self.Calibration_radiobutton = tk.Radiobutton(self.Status_frame, text=MRB_Constants.STATE_CALIBRATION, variable=self.program_state, value="Calibration")
             self.Calibration_radiobutton.place(relx=0.063, rely=0.421, relheight=0.263, relwidth=0.538, bordermode='ignore')
             self.Calibration_radiobutton.configure(activebackground="#d9d9d9")
             self.Calibration_radiobutton.configure(anchor='w')
             self.Calibration_radiobutton.configure(background="#d9d9d9")
             self.Calibration_radiobutton.configure(justify='left')
             
-            self.Active_radiobutton = tk.Radiobutton(self.Status_frame, text="Active", variable=self.state, value="Active")
+            self.Active_radiobutton = tk.Radiobutton(self.Status_frame, text=MRB_Constants.STATE_ACTIVE, variable=self.program_state, value="Active")
             self.Active_radiobutton.place(relx=0.063, rely=0.632, relheight=0.263, relwidth=0.425, bordermode='ignore')
             self.Active_radiobutton.configure(activebackground="#d9d9d9")
             self.Active_radiobutton.configure(anchor='w')
@@ -265,12 +292,12 @@ class MRB_GUI:
             self.Webcam_mask = tk.Canvas(top_layer, width=320, height=240, background="#c9c9c9", highlightthickness=1, highlightbackground="black")
             self.Webcam_mask.grid(row=1, column=0)
 
-            self.select_button(self.Ball_calibration_button)
+            self.set_select_state(self.Ball_color_calibration_button)
 
-        def select_button(self, button):
-            self.Ball_calibration_button.configure(state='normal')
-            self.Ball_position_button.configure(state='normal')
+        def set_select_state(self, button):
+            self.Ball_color_calibration_button.configure(state='normal')
+            self.Ball_destination_button.configure(state='normal')
             self.Servo_calibration_button.configure(state='normal')
-
             button.configure(state='disabled')
+
             self.selection_mode.set(button['text'])
