@@ -25,8 +25,7 @@ class MRB_GUI:
 
     def update_gui(self):
         new_state = self.top.program_state.get()
-        old_state = self.top.previous_state
-        if new_state != old_state:
+        if new_state != self.top.previous_state:
             if new_state == MRB_Constants.STATE_CALIBRATION:
                 self.top.Ser1_scale.config(state="normal")
                 self.top.Ser2_scale.config(state="normal")
