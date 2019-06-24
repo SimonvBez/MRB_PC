@@ -11,6 +11,13 @@ class Point:
     def init_from_list(cls, a):
         return cls(a[0], a[1])
 
+    @classmethod
+    def init_from_list_list(cls, a):
+        result = []
+        for p in a:
+            result.append(Point.init_from_list(p))
+        return result
+
     def __add__(self, other):
         return Point(self.x + other.x, self.y + other.y)
 

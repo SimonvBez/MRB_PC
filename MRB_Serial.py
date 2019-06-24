@@ -57,10 +57,10 @@ class MRB_Serial:
                 self.servo_times = end_times
 
     def set_servo_percentage(self, servo_num, percentage):
-        self.set_servo(servo_num, 550 - int(percentage * 1.5))
+        self.set_servo(servo_num, 550 - int(percentage * 1.0))
 
     def set_servo_percentages(self, percentages):
         end_times = []
         for i in range(len(percentages)):
-            end_times.append(550 - int(percentages[i] * 1.5))
+            end_times.append(540 - int(percentages[i] * 1.0))
         self.set_servos(end_times)

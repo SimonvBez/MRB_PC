@@ -7,6 +7,7 @@ import PIL.ImageTk
 import PIL.Image
 import threading
 import MRB_Serial
+import MRB_linear_algebra
 import serial
 
 
@@ -113,10 +114,13 @@ class MRB_Controller():
                 state = self.gui.get_program_state()
 
                 if state == MRB_Constants.STATE_ACTIVE:
-                    self.set_servo_percentages_with_offset([100, 100, 100])
+                    self.set_servo_percentages_with_offset([0, 0, 0])
+                    # if (None, None) not in self.servo_positions and self.ball_destination != (None, None) and self.ball_position != (None, None):
+                    #     print(MRB_linear_algebra.calculate_distance_per_servo(self.servo_positions, self.ball_position, self.ball_destination))
+
                     time.sleep(0.1)
                 elif state == MRB_Constants.STATE_CALIBRATION:
-                    self.set_servo_percentages_with_offset([0, 0, 0])
+                    self.set_servo_percentages_with_offset([100, 100, 100])
                     time.sleep(0.05)
                 elif state == MRB_Constants.STATE_IDLE:
                     self.arduino.reset_servos()
