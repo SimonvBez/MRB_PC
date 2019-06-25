@@ -12,3 +12,5 @@ STATE_ACTIVE = "Active"
 CONNECTING = "Connecting..."
 CONNECTED = "Connected"
 DISCONNECTED = "Disconnected"
+
+PID_SAMPLE_TIME = 0.01

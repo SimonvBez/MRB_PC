@@ -71,7 +71,7 @@ def get_effective_servo_angles(angle_list, compare_angle):
     return result
 
 
-def calculate_distance_per_servo(servo_positions, ball_position, ball_destination):
+def calculate_distances(servo_positions, ball_position, ball_destination):
     servo_positions = Point.init_from_list_list(servo_positions)
     servo_angles = []
 

@@ -1,4 +1,8 @@
+import MRB_linear_algebra
 import MRB_Constants
+from simple_pid import PID
+import MRB_Serial
+import MRB_PID
 import time
 import cv2
 import numpy as np
@@ -6,8 +10,6 @@ import imutils
 import PIL.ImageTk
 import PIL.Image
 import threading
-import MRB_Serial
-import MRB_linear_algebra
 import serial
 
 
@@ -19,18 +21,18 @@ class MRB_Controller():
         self.hsv = None
         self.video_cap = None
         self.gui = None
-        self.servo_offsets = [0] * 3
         self.servo_positions = [(None, None)] * 3
         self.servo_calibration_counter = 0
         self.ball_destination = (None, None)
         self.ball_position = (None, None)
         self.arduino = None
+        self.gui_settings = None
 
     def set_gui(self, gui):
         self.gui = gui
 
     def set_servo_percentages_with_offset(self, servo_values):
-        self.arduino.set_servo_percentages([servo_values[i] + self.servo_offsets[i] for i in range(3)])
+        self.arduino.set_servo_percentages([servo_values[i] + self.gui_settings["SerOffsets"][str(i+1)] for i in range(3)])
 
     def window_click(self, event):
         select_mode = self.gui.get_select_mode()
@@ -49,7 +51,7 @@ class MRB_Controller():
             self.ball_destination = (event.x, event.y)
 
     def cam_thread(self):
-        self.video_cap = cv2.VideoCapture(0)
+        self.video_cap = cv2.VideoCapture(1)
 
         while True:
             if self.video_cap.isOpened():
@@ -93,9 +95,8 @@ class MRB_Controller():
                     cv2.circle(bgr, self.ball_destination, 9, (60, 155, 0), -1)
                     cv2.circle(bgr, self.ball_destination, 10, (60, 255, 0), 3)
 
-                mask = cv2.resize(mask, None, fx=0.5, fy=0.5)
-
                 # Put it all in the GUI
+                mask = cv2.resize(mask, None, fx=0.5, fy=0.5)
                 rgb_photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)))
                 mask_photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(mask))
                 self.gui.get_top().Webcam.create_image(0, 0, image=rgb_photo, anchor='nw')
@@ -106,6 +107,23 @@ class MRB_Controller():
             else:
                 time.sleep(0.2)
 
+    @staticmethod
+    def create_pids():
+        pids = []
+        # for i in range(3):
+        #     pid = MRB_PID.MRB_PID()
+        #     pid.set_sample_time(MRB_Constants.PID_SAMPLE_TIME)
+        #     pid.set_output_limits(0, 100)
+        #     pid.set_setpoint(0)
+        #     pids.append(pid)
+        for i in range(3):
+            pid = PID(0, 0, 0, setpoint=0, output_limits=(0, 100))
+            pids.append(pid)
+        return pids
+
+    def all_values_present(self):
+        return (None, None) not in self.servo_positions and self.ball_destination != (None, None) and self.ball_position != (None, None)
+
     def gui_thread(self):
         t1 = threading.Thread(target=self.cam_thread)
         t1.setDaemon(True)
@@ -113,17 +131,31 @@ class MRB_Controller():
 
         self.arduino = MRB_Serial.MRB_Serial()
         self.gui.set_connected(True)
+
+        pid_controllers = self.create_pids()
+
         while True:
             try:
-                self.servo_offsets = self.gui.get_servo_offsets()
+                self.gui_settings = self.gui.get_settings()
                 state = self.gui.get_program_state()
+                start_time = time.time()
 
                 if state == MRB_Constants.STATE_ACTIVE:
-                    self.set_servo_percentages_with_offset([0, 0, 0])
-                    # if (None, None) not in self.servo_positions and self.ball_destination != (None, None) and self.ball_position != (None, None):
-                    #     print(MRB_linear_algebra.calculate_distance_per_servo(self.servo_positions, self.ball_position, self.ball_destination))
+                    if self.all_values_present():
+                        servo_roll_distances = MRB_linear_algebra.calculate_distances(self.servo_positions, self.ball_position, self.ball_destination)
+                        servo_percentages = []
 
-                    time.sleep(0.1)
+                        for i in range(3):
+                            pid_controllers[i].tunings = (-self.gui_settings["PID"]["P"], -self.gui_settings["PID"]["I"], -self.gui_settings["PID"]["D"])
+
+                            servo_percentages.append(100 - pid_controllers[i](servo_roll_distances[i]))
+
+                        print(servo_roll_distances)
+                        print(servo_percentages, end='\n\n')
+                        self.arduino.set_servo_percentages(servo_percentages)
+
+                    if (time.time() - start_time) < MRB_Constants.PID_SAMPLE_TIME:
+                        time.sleep(MRB_Constants.PID_SAMPLE_TIME - (time.time() - start_time))
                 elif state == MRB_Constants.STATE_CALIBRATION:
                     self.set_servo_percentages_with_offset([100, 100, 100])
                     time.sleep(0.05)
