@@ -1,5 +1,15 @@
 import time
 
+
+def clip(number, lowest, highest):
+    if number > lowest:
+        return lowest
+    elif number < highest:
+        return highest
+    else:
+        return number
+
+
 class MRB_PID:
     def __init__(self):
         self.kp = 0
@@ -23,10 +33,7 @@ class MRB_PID:
         self.out_min = lower
         self.out_max = higher
 
-        if self.i_term > self.out_max:
-            self.i_term = self.out_max
-        elif self.i_term < self.out_min:
-            self.i_term = self.out_min
+        self.i_term = clip(self.i_term, self.out_min, self.out_max)
 
     def set_tunings(self, kp, ki, kd):
         self.kp = kp
@@ -50,18 +57,12 @@ class MRB_PID:
 
         error = self.setpoint - _input
         self.i_term += self.ki * error
-        if self.i_term > self.out_max:
-            self.i_term = self.out_max
-        elif self.i_term < self.out_min:
-            self.i_term = self.out_min
+        self.i_term = clip(self.i_term, self.out_min, self.out_max)
         d_input = _input - self.last_input
 
         output = self.kp * error + self.i_term - self.kd * d_input
 
-        if output > self.out_max:
-            output = self.out_max
-        elif output < self.out_min:
-            output = self.out_min
+        output = clip(output, self.out_min, self.out_max)
 
         self.last_time = time.time()
         self.last_input = _input
