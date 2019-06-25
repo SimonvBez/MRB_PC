@@ -74,10 +74,14 @@ class MRB_Controller():
                         self.ball_position = center
                         cv2.circle(bgr, (int(x), int(y)), int(radius), (0, 255, 255), 2)
                         cv2.circle(bgr, center, 5, (0, 0, 255), -1)
+                    else:
+                        self.ball_position = (None, None)
+                else:
+                    self.ball_position = (None, None)
 
                 # Draw servo positions
                 for i in range(len(self.servo_positions)):
-                    if self.servo_positions[i][0] is not None:
+                    if self.servo_positions[i] != (None, None):
                         text_position = list(self.servo_positions[i])
                         text_position[0] -= 10
                         text_position[1] += 10
@@ -85,8 +89,9 @@ class MRB_Controller():
                         cv2.putText(bgr, str(i + 1), text_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
                 # Draw ball destination
-                if self.ball_destination[0] is not None:
-                    cv2.circle(bgr, self.ball_destination, 10, (60, 255, 0), 2)
+                if self.ball_destination != (None, None):
+                    cv2.circle(bgr, self.ball_destination, 9, (60, 155, 0), -1)
+                    cv2.circle(bgr, self.ball_destination, 10, (60, 255, 0), 3)
 
                 mask = cv2.resize(mask, None, fx=0.5, fy=0.5)
 
